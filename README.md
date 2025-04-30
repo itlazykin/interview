@@ -8,6 +8,7 @@
 + [SQL](src/main/java/ru/job4j/SQL.md#SQL)
 + [NoSql](src/main/java/ru/job4j/NoSql.md#NoSql)
 + [ORM](src/main/java/ru/job4j/ORM.md#ORM)
++ [Test](src/main/java/ru/job4j/Test.md#Test)
 
 
 

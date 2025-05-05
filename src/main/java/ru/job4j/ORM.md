@@ -48,7 +48,7 @@
 
 [Hibernate и Lombok](#hibernate-и-lombok)
 
-[](#)
+[Как JPA делает запросы?](#как-jpa-делает-запросы)
 
 # Что такое Hibernate, JPA, JDBC, ORM?
 

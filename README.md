@@ -7,6 +7,7 @@
 + [Исключения](src/main/java/ru/job4j/Exceptions.md#Exceptions)
 + [SOLID](src/main/java/ru/job4j/SOLID.md#SOLID)
 + [Дженерики](src/main/java/ru/job4j/Generics.md#Generics)
++ [Многопоточка](src/main/java/ru/job4j/Multithreading.md#Multithreading)
 + [Git](src/main/java/ru/job4j/Git.md#git)
 + [DB](src/main/java/ru/job4j/DB.md#DB)
 + [SQL](src/main/java/ru/job4j/SQL.md#SQL)

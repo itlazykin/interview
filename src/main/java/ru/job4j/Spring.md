@@ -1142,68 +1142,1085 @@ Jackson
 
 # Spring Criteria API
 
+Spring Criteria API (часть Hibernate) предоставляет гибкий способ построения запросов к базе данных. Она основана на
+использовании объектно-ориентированных принципов, позволяя составлять SQL-запросы с использованием Java-классов вместо
+ручного написания SQL.
+
+### Ключевые особенности Criteria API
+
++ Динамическое построение запросов: Удобно для ситуаций, когда структура запроса может меняться в зависимости от
+  условий.
++ Безопасность типов: Ошибки в синтаксисе запросов обнаруживаются на этапе компиляции.
++ Ленивость: Запрос выполняется только при обращении к результатам.
++ Поддержка сложных запросов: Подзапросы, группировки, сортировки, фильтрации и агрегатные функции.
+
+### Пример базового использования
+
+```java
+Установка сущности
+        
+@Entity
+public class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    private double salary;
+
+    // getters и setters
+}
+```
+
+```java
+Использование Criteria API
+
+@Repository
+public class EmployeeRepository {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public List<Employee> findEmployeesWithSalaryGreaterThan(double minSalary) {
+        // Получаем CriteriaBuilder
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+
+        // Создаём CriteriaQuery
+        CriteriaQuery<Employee> criteriaQuery = criteriaBuilder.createQuery(Employee.class);
+
+        // Корневой объект (FROM Employee)
+        Root<Employee> root = criteriaQuery.from(Employee.class);
+
+        // Условие (WHERE salary > :minSalary)
+        criteriaQuery.select(root)
+                     .where(criteriaBuilder.gt(root.get("salary"), minSalary));
+
+        // Выполняем запрос
+        return entityManager.createQuery(criteriaQuery).getResultList();
+    }
+}
+```
+
 [К оглавлению](#Spring)
 
 # @Scheduled
+
+Аннотация @Scheduled используется для выполнения методов по расписанию. Она позволяет запускать задачи с фиксированным
+интервалом времени, фиксированной задержкой или на основе cron-выражений.
 
 [К оглавлению](#Spring)
 
 # Понятие Controller и Servlet в Java. Это одно и то же? Если разное, в чем отличия?
 
+Servlet — это Java-класс, который обрабатывает HTTP-запросы (HTTP GET, POST и т.д.) и возвращает HTTP-ответы.
+Он является основой для создания серверных приложений в Java.
+
+Controller — это часть архитектуры MVC (Model-View-Controller). В контексте Java это обычно класс, аннотированный,
+например, @Controller в Spring MVC, который обрабатывает HTTP-запросы и управляет их маршрутизацией.
+
+Контроллер абстрагирует разработчика от низкоуровневых деталей (например, работы с HTTP-запросами и ответами), позволяя
+сосредоточиться на бизнес-логике.
+
+### Основные отличия Servlet и Controller
+
+| Критерий           | Servlet                                                              | Controller                                                 |
+|--------------------|----------------------------------------------------------------------|------------------------------------------------------------|
+| Область применения | Низкоуровневая обработка HTTP-запросов.                              | Высокоуровневый компонент архитектуры MVC                  |
+| Ручная работа      | Требуется больше ручной работы для маршрутизации и обработки данных. | Маршрутизация и обработка запросов автоматизированы        |
+| Инструменты        | Использует контейнер сервлетов (например, Tomcat)                    | Использует веб-фреймворки (например, Spring MVC)           |
+| Гибкость           | Полный контроль над HTTP-запросами и ответами                        | Сосредоточен на бизнес-логике, делегируя детали фреймворку |
+| Уровень абстракции | Низкий: работа напрямую с HttpServletRequest и HttpServletResponse.  | Высокий: аннотации и абстрагирование низкоуровневой логики |
+| Пример             | HttpServlet, GenericServlet                                          | @Controller в Spring, @RestController                      |
+
+### Когда использовать?
+
+| Ситуация                                     | Servlet     | Controller      |
+|----------------------------------------------|-------------|-----------------|
+| Вам нужен полный контроль над HTTP-запросами | Да          | Нет             |
+| Вы используете современные фреймворки        | Редко       | Да              |
+| Требуется простота разработки                | Нет         | Да              |
+| Вы пишете сложное веб-приложение             | Непрактично | Предпочтительно |
+
 [К оглавлению](#Spring)
 
 # Что такое объект Filter? В какой момент вызывается?
+
+Filter — это интерфейс из Java Servlet API, который позволяет перехватывать и изменять HTTP-запросы и ответы. Фильтры
+часто используются для задач, которые необходимо выполнить до или после обработки запроса в сервлете, например:
+
++ Аутентификация и авторизация. 
++ Логирование запросов. 
++ Сжатие ответов.
++ Кэширование.
++ Добавление или изменение заголовков запросов и ответов.
+
+### Когда вызывается фильтр?
+
+Фильтры вызываются до попадания HTTP-запроса к сервлету (или контроллеру) и после возвращения ответа от сервлета. Они
+служат промежуточным уровнем между клиентом и сервлетом.
+
++ До сервлета: Обрабатывают входящий HTTP-запрос. 
++ После сервлета: Могут изменить HTTP-ответ перед отправкой клиенту.
 
 [К оглавлению](#Spring)
 
 # Что такое ApplicationContext?
 
+ApplicationContext — это центральный интерфейс контейнера Spring, который управляет жизненным циклом бинов, их
+зависимостями и предоставляет дополнительные возможности для разработки приложений. Это расширение интерфейса
+BeanFactory, добавляющее множество дополнительных функций, таких как обработка событий, поддержка интернационализации и
+интеграция с AOP.
+
+### Основные функции ApplicationContext
+
++ Управление бин-компонентами:
+Автоматическое создание, связывание и уничтожение бинов.
++ Инжекция зависимостей:
+Поддерживает механизмы Dependency Injection (DI).
++ Обработка событий:
+Поддерживает публикацию и прослушивание событий (например, ContextRefreshedEvent).
++ Интернационализация:
+Предоставляет механизмы для работы с сообщениями и лОкалями(Locale).
++ Интеграция с AOP:
+Позволяет внедрять аспекты в приложение.
+
+```java
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class MyApp {
+  public static void main(String[] args) {
+    ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+    MyBean myBean = context.getBean(MyBean.class);
+    myBean.doSomething();
+  }
+}
+```
+
+### Расскажи про разницу между ApplicationContext и BeanFactory
+
+BeanFactory — это базовый контейнер Spring для управления объектами (бинами).
+Он отвечает за инициализацию, связывание и предоставление бинов по запросу.
+Однако BeanFactory менее функционален, чем ApplicationContext, так как предоставляет только базовые возможности управления бинами.
+
+````
+import org.springframework.beans.factory.xml.XmlBeanFactory
+import org.springframework.core.io.ClassPathResource;
+
+public class MyApp {
+    public static void main(String[] args) {
+        BeanFactory factory = new XmlBeanFactory(new ClassPathResource("beans.xml"));
+        MyBean myBean = (MyBean) factory.getBean("myBean");
+        myBean.doSomething();
+    }
+}
+````
+
++ ApplicationContext — более мощный и функциональный контейнер, подходящий для полноценных приложений. 
++ BeanFactory — легковесный контейнер, используется редко и преимущественно в ограниченных задачах или для оптимизации ресурсов.
+
+### Различия между ApplicationContext и BeanFactory
+
+| Критерий                        | ApplicationContext                                                                  | BeanFactory                                              |
+|---------------------------------|-------------------------------------------------------------------------------------|----------------------------------------------------------|
+| Область применения              | Полноценный контейнер для разработки современных приложений                         | Базовый контейнер для управления бинами                  |
+| Загрузка бинов                  | Загружает все бины при инициализации контекста (eager loading)                      | Загружает бины по запросу (lazy loading)                 |
+| Поддержка событий               | Поддерживает публикацию и обработку событий (ApplicationEvent)                      | Не поддерживает события                                  |
+| Интернационализация             | Встроенная поддержка интернационализации (I18N).                                    | Отсутствует                                              |
+| Интеграция с AOP                | Поддержка AOP для внедрения аспектов                                                | Ограниченная интеграция с AOP                            |
+| Преимущество производительности | Менее производителен при большом количестве бинов (загрузка всех бинов при старте). | Производителен, так как загружает бины только по запросу |
+| Поддержка аннотаций             | Полная поддержка аннотаций (например, @Component, @Autowired)                       | Ограниченная поддержка                                   |
+| Расширенные возможности         | Поддержка профилей, автоконфигурации, REST и других функций.                        | Только базовая работа с бинами                           |
+
+### Когда использовать
+
+| Ситуация                                     | ApplicationContext     | BeanFactory |
+|----------------------------------------------|------------------------|-------------|
+| Полноценное приложение                       | Да                     | Нет         |
+| Требуется работа с событиями                 | Да                     | Нет         |
+| Экономия памяти при большом количестве бинов | Нет                    | Да          |
+| Тестовые приложения                          | Возможен, но избыточен | Да          |
+
+### Можно поднять несколько контекстов?
+
+Да, в Spring можно создать несколько контекстов. Это может быть полезно для разделения конфигурации, областей ответственности или работы с вложенными контекстами.
+
+### Примеры использования нескольких контекстов
+
+1. Вложенные контексты
+
+Можно создать основной (parent) и дочерний (child) контексты. Основной контекст может предоставлять бины, доступные дочерним контекстам, но не наоборот.
+
+````
+Пример:
+
+ApplicationContext parentContext = new AnnotationConfigApplicationContext(ParentConfig.class);
+AnnotationConfigApplicationContext childContext = new AnnotationConfigApplicationContext();
+childContext.setParent(parentContext);
+childContext.register(ChildConfig.class);
+childContext.refresh();
+````
+
+2. Несколько независимых контекстов
+
+Если контексты не связаны друг с другом, они не делятся бинами и настройками.
+
+````
+Пример:
+
+ApplicationContext context1 = new AnnotationConfigApplicationContext(AppConfig1.class);
+ApplicationContext context2 = new AnnotationConfigApplicationContext(AppConfig2.class);
+````
+
+Преимущества использования нескольких контекстов:
+
++ Разделение конфигурации между модулями приложения. 
++ Изоляция модулей для тестирования. 
++ Улучшение модульности и читаемости кода.
+
+Недостатки:
+
++ Увеличенная сложность управления. 
++ Возможные конфликты бинов между контекстами.
+
 [К оглавлению](#Spring)
 
 # Зачем нужны аннотации @RequestParam и @PathVariable?
+
+Эти аннотации используются в Spring MVC для извлечения параметров из HTTP-запросов. Они применяются в контроллерах для получения входных данных.
+
+`@RequestParam` :
+Аннотация, которая позволяет извлекать параметры запроса (Query Parameters) из URL.
+
++ Используется для параметров, указанных после ? в строке запроса. 
++ Может задавать значения по умолчанию.
+
+````
+Пример: Запрос:
+GET /api/users?name=John&page=1
+
+@GetMapping("/api/users")
+public String getUser(@RequestParam String name, @RequestParam(defaultValue = "0") int page) {
+  return "Name: " + name + ", Page: " + page;
+}
+
+// Результат: Name: John, Page: 1
+````
+
+`@PathVariable` : 
+Аннотация, которая позволяет извлекать значения из пути запроса (Path Variables).
+
++ Используется для параметров, включенных в шаблон URL.
+
+````
+Пример: Запрос:
+GET /api/users/42
+
+@GetMapping("/api/users/{id}")
+public String getUserById(@PathVariable int id) {
+  return "User ID: " + id;
+}
+
+// Результат: User ID: 42
+````
 
 [К оглавлению](#Spring)
 
 # @ConfigurationProperties? ConfigurationProperties vs Value
 
+Аннотация @ConfigurationProperties используется для привязки свойств из файла конфигурации (например, application.properties или application.yml) к Java-классу.
+
+### Как работает @ConfigurationProperties?
+
++ Привязывает свойства по префиксу к полям класса. 
++ Удобна для работы с группами связанных настроек. 
++ Требует аннотации @EnableConfigurationProperties или компонентов типа @Component.
+
+```java
+app:
+  name: MyApp
+  version: 1.0
+```
+
+```java
+Класс конфигурации:
+
+@ConfigurationProperties(prefix = "app")
+@Component
+public class AppProperties {
+    private String name;
+    private String version;
+
+    // Getters and setters
+}
+```
+
+```java
+Использование:
+
+@Component
+public class MyService {
+    private final AppProperties appProperties;
+
+    public MyService(AppProperties appProperties) {
+        this.appProperties = appProperties;
+    }
+
+    public void printConfig() {
+        System.out.println("App Name: " + appProperties.getName());
+        System.out.println("Version: " + appProperties.getVersion());
+    }
+}
+```
+
+### Сравнение @ConfigurationProperties и @Value
+
+| Критерий                 | @ConfigurationProperties                                   | @Value                              |
+|--------------------------|------------------------------------------------------------|-------------------------------------|
+| Привязка групп свойств   | Удобна для групп связанных настроек (с префиксом)          | Подходит для одиночных свойств      |
+| Приведение типов         | Автоматически поддерживает сложные типы (например, списки) | Поддерживает только базовые типы    |
+| Работа с файлами YAML    | Полностью поддерживается, включая сложные структуры        | Менее удобна для сложных структур   |
+| Гибкость                 | Удобна для крупных конфигураций                            | Быстрее для мелких настроек         |
+| Пример использования     | @ConfigurationProperties(prefix = "app")                   | @Value("${app.name}")               |
+| Аннотации                | Требует @EnableConfigurationProperties или @Component.     | Не требует дополнительных аннотаций |
+| Тестирование и валидация | Поддерживает валидацию через @Validated.                   | Не поддерживает валидацию           |
+
+### Когда использовать
+
+| Ситуация                             | @ConfigurationProperties | @Value |
+|--------------------------------------|--------------------------|--------|
+| Большое количество связанных свойств | Да                       | Нет    |
+| Одиночное свойство                   | Нет                      | Да     |
+| Сложные структуры (списки, объекты)  | Да                       | Нет    |
+| Простые, статические значения        | Нет                      | Да     |
+
 [К оглавлению](#Spring)
 
 # @Value. Что это?
+
+@Value — это аннотация Spring, которая позволяет внедрять значения из конфигурационных файлов (application.properties,
+application.yml), системных переменных или других внешних источников в поля, методы или конструкторы класса.
+
+`Основное назначение`: получить значение переменной или настроек из конфигурации.
+
+### Как использовать @Value?
+
+````
+app.name=MyApp
+app.version=1.0
+````
+
+````
+@Component
+public class AppConfig {
+
+    @Value("${app.name}")
+    private String appName;
+
+    @Value("${app.version}")
+    private String appVersion;
+
+    @Value("${app.description:Default Description}") // Значение по умолчанию
+    private String appDescription;
+
+    public void printConfig() {
+        System.out.println("Name: " + appName);
+        System.out.println("Version: " + appVersion);
+        System.out.println("Description: " + appDescription);
+    }
+}
+
+// Результат:
+// Name: MyApp
+// Version: 1.0
+// Description: Default Description
+````
 
 [К оглавлению](#Spring)
 
 # Как работает DispatcherServlet?
 
+DispatcherServlet — это основной компонент Spring MVC, который обрабатывает входящие HTTP-запросы, направляет их к
+соответствующим контроллерам, обрабатывает ответы и возвращает их клиенту.
+
+Это центральный обработчик HTTP-запросов в Spring MVC.
+
+### Основной цикл работы DispatcherServlet
+
++ Получение HTTP-запроса:
+DispatcherServlet обрабатывает все запросы, поступающие в приложение (если настроен как фронт-контроллер в web.xml или
+через Java Config).
++ Определение подходящего контроллера:
+С помощью HandlerMapping находит контроллер, который должен обработать запрос, основываясь на URL и методе HTTP.
++ Выбор метода обработчика:
+С помощью аннотаций контроллера (@RequestMapping, @GetMapping, @PostMapping и др.) определяется, какой метод должен быть
+вызван.
++ Обработка запроса:
+Контроллер выполняет бизнес-логику и возвращает ModelAndView или объект в формате JSON/XML (например, с @ResponseBody).
++ Обработка ответа:
+Результат передается в компонент ViewResolver, который определяет, какое представление (HTML, JSP, JSON и др.) нужно
+отрендерить.
++ Возврат клиенту:
+Готовый HTTP-ответ отправляется обратно клиенту.
+
+### Компоненты в работе DispatcherServlet
+
+| Компонент         | Описание                                                                             |
+|-------------------|--------------------------------------------------------------------------------------|
+| HandlerMapping    | Определяет, какой обработчик (контроллер) будет вызван для конкретного запроса       |
+| HandlerAdapter    | Определяет, как вызывать метод обработчика (например, метод контроллера)             |
+| ViewResolver      | Определяет, какое представление (JSP, Thymeleaf, JSON) нужно использовать для ответа |
+| ExceptionResolver | Обрабатывает исключения и может возвращать пользовательские ответы в случае ошибок   |
+| LocaleResolver    | Обеспечивает поддержку локализации, определяя текущий язык и регион пользователя     |
+
 [К оглавлению](#Spring)
 
 # Варианты обработки Exceptions в Spring
+
+1. @ExceptionHandler
+
++ Используется для обработки исключений на уровне контроллера.
++ Позволяет привязать обработку конкретных исключений к определённому методу в контроллере.
+
+````
+Пример:
+
+@RestController
+public class MyController {
+
+    @GetMapping("/test")
+    public String test() {
+        throw new IllegalArgumentException("Invalid input");
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+    }
+}
+````
+
+2. @ControllerAdvice
+
++ Обрабатывает исключения для всех контроллеров в приложении.
++ Удобен для создания глобальной обработки ошибок.
+
+````
+Пример:
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body("Global Error: " + e.getMessage());
+    }
+}
+````
+
+3. ResponseStatusException
+
++ Позволяет выбрасывать исключения с указанием HTTP-статуса и сообщения.
+
+````
+Пример:
+
+@GetMapping("/error")
+public void error() {
+  throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+}
+````
+
+4. @ResponseStatus
+
++ Устанавливает HTTP-статус для указанного исключения.
+
+````
+Пример:
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class ResourceNotFoundException extends RuntimeException {
+  public ResourceNotFoundException(String message) {
+    super(message);
+  }
+}
+
+Использование в контроллере:
+
+@GetMapping("/resource")
+public void getResource() {
+  throw new ResourceNotFoundException("Resource not found");
+}
+````
+
+5. HandlerExceptionResolver
+
++ Низкоуровневый подход для полного контроля над обработкой исключений.
++ Требует реализации интерфейса HandlerExceptionResolver.
+
+````
+Пример:
+
+@Component
+public class CustomExceptionResolver implements HandlerExceptionResolver {
+
+    @Override
+    public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        try {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView();
+    }
+}
+````
+
+6. RestTemplate и WebClient
+
++ Для обработки ошибок при выполнении REST-запросов можно использовать кастомные обработчики ошибок, такие как ResponseErrorHandler для RestTemplate.
+
+````
+Пример:
+
+RestTemplate restTemplate = new RestTemplate();
+restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
+  @Override
+  public void handleError(ClientHttpResponse response) throws IOException {
+      // Обработка ошибки
+  }
+});
+````
+
+### Как транзакционная логика обрабатывает исключения?
+
+Spring использует транзакционный менеджер для обработки транзакций. Исключения в транзакционной логике влияют на коммит или откат (rollback) транзакции.
+
+### Основные принципы обработки исключений в транзакциях:
+
++ Rollback для RuntimeException и Error:
+По умолчанию, Spring откатывает транзакцию при возникновении RuntimeException или Error.
+Исключения типа Checked Exception (например, SQLException) не приводят к откату транзакции, если это явно не указано.
++ Настройка rollback: Можно указать, какие исключения должны приводить к откату.
+
+```java
+Пример:
+
+@Transactional(rollbackFor = Exception.class)
+public void performTransaction() throws Exception {
+    // Если выбрасывается Exception, транзакция откатывается
+    throw new Exception("Transaction failed");
+}
+```
+
++ Сохранение состояния после исключения: Если транзакция откатывается, изменения, внесённые в базу данных в рамках транзакции, не сохраняются.
+
++ Работа с @Transactional:
+Если транзакция завершается с ошибкой, контейнер Spring вызывает метод rollback у используемого транзакционного менеджера.
+Для методов private или вызовов внутри того же класса обработка транзакций может не сработать.
+
+```java
+@Transactional
+public void process() {
+    try {
+        performAction();
+    } catch (Exception e) {
+        // Исключение обработано, транзакция откатывается
+        throw e;
+    }
+}
+
+private void performAction() {
+    // Действия, которые вызывают исключение
+    throw new RuntimeException("Error in action");
+}
+```
+
+### Основные проблемы и решения
+
+| Проблема                                            | Решение                                                                                         |
+|-----------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| Внутренний вызов метода с @Transactional            | Использовать прокси или вызывать метод через другой бин.                                        |
+| Исключение Checked Exception не приводит к rollback | Указать rollbackFor в аннотации @Transactional.                                                 |
+| Повторное использование транзакции                  | Указать параметр propagation, например, Propagation.REQUIRES_NEW для открытия новой транзакции. |
 
 [К оглавлению](#Spring)
 
 # @Configuration. Является Configuration компонентом? Какую доп логику Configuration реализует?
 
+Аннотация @Configuration является специализированным компонентом Spring. Она указывает, что класс используется для определения конфигурации приложения, включая создание бинов. Этот класс обрабатывается так же, как и класс с аннотацией @Component.
+
+### Дополнительная логика, реализуемая @Configuration
+
++ Определение бинов (@Bean): Классы с @Configuration позволяют определять методы, помеченные как @Bean, которые возвращают объекты, управляемые контейнером Spring.
+
+```java
+Пример:
+
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public MyService myService() {
+        return new MyService();
+    }
+}
+
+```
+
++ Поддержка прокси (proxyBeanMethods = true): По умолчанию, Spring оборачивает класс с @Configuration в прокси для обеспечения корректного создания и управления зависимостями. Это позволяет ссылаться на один и тот же экземпляр бина.
+
+````
+Пример:
+
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public ServiceA serviceA() {
+        return new ServiceA(serviceB());
+    }
+
+    @Bean
+    public ServiceB serviceB() {
+        return new ServiceB();
+    }
+}
+
+При вызове serviceB() внутри метода serviceA() 
+контейнер Spring возвращает тот же экземпляр ServiceB.
+````
+
++ Логика для импорта конфигурации: Класс с @Configuration может импортировать другие классы конфигурации через @Import.
+
+````
+Пример:
+
+@Configuration
+@Import(AnotherConfig.class)
+public class AppConfig {}
+````
+
++ Поддержка дополнительных аннотаций: В классах с @Configuration можно использовать такие аннотации, как @ComponentScan, @PropertySource, и другие для настройки приложения
+
+### @Configuration vs @Component
+
+Аннотации @Configuration и @Component в Spring используются для регистрации бинов в контейнере, но они имеют разные цели и поведение.
+
+| Критерий                     | @Configuration                                                    | @Component                                                |
+|------------------------------|-------------------------------------------------------------------|-----------------------------------------------------------|
+| Назначение                   | Используется для создания конфигурационных классов и бинов        | Используется для обозначения обычного Spring-компонента   |
+| Создание бинов               | Определяет бины через методы с аннотацией @Bean.                  | Бины создаются автоматически (через сканирование классов) |
+| Прокси (proxyBeanMethods)    | По умолчанию true, что обеспечивает singleton для бинов.          | Прокси не используется                                    |
+| Семантика                    | Обозначает, что класс содержит настройки для приложения           | Описывает логический компонент приложения                 |
+| Импорт конфигураций          | Поддерживает @Import для подключения других конфигураций          | Не поддерживает импорт                                    |
+| Использование вместе с @Bean | Методы с @Bean гарантируют создание одного экземпляра (singleton) | Не имеет встроенной поддержки для @Bean                   |
+| Где использовать             | В конфигурационных классах для определения настроек и бинов.      | В служебных классах, сервисах, репозиториях и т. д.       |
+
+1. @Configuration
+
+Аннотация @Configuration обозначает, что класс содержит определения бинов и может быть использован Spring-контейнером для генерации и управления этими бинами.
+
++ Используется для конфигурации приложения.
++ Прокси: Spring создает прокси для обеспечения правильного вызова методов внутри класса конфигурации.
+
+````
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public ServiceA serviceA() {
+        return new ServiceA(serviceB());
+    }
+
+    @Bean
+    public ServiceB serviceB() {
+        return new ServiceB();
+    }
+}
+
+Если метод serviceA() вызывает serviceB(), Spring использует прокси, 
+чтобы вернуть тот же экземпляр ServiceB, созданный контейнером.
+````
+
+2. @Component
+
+Аннотация @Component регистрирует класс как бин в Spring-контейнере. Она более общего назначения и применяется для различных типов классов (сервисы, репозитории, контроллеры и т. д.).
+
++ Используется для описания компонентов, которые выполняют определенную логику. 
++ Не создает прокси: методы внутри класса с @Component вызываются напрямую
+
+````
+@Component
+public class AppConfig {
+
+    @Bean
+    public ServiceA serviceA() {
+        return new ServiceA(serviceB());
+    }
+
+    @Bean
+    public ServiceB serviceB() {
+        return new ServiceB();
+    }
+}
+В данном случае метод serviceB() вызывается каждый раз напрямую,
+и создается новый экземпляр ServiceB.
+````
+
+### Когда использовать @Configuration и @Component?
+
+`@Configuration`:
+
++ Если нужно определить сложные зависимости. 
++ Когда требуется управление экземплярами через прокси. 
++ Для работы с бинами, определенными вручную через @Bean.
+
+`@Component`:
+
++ Для обозначения служебных классов, выполняющих конкретные задачи. 
++ Для автоматического сканирования компонентов.
+
 [К оглавлению](#Spring)
 
 # @PostConstruct
+
+Аннотация @PostConstruct из пакета javax.annotation указывает метод, который должен быть выполнен после того, как бин был полностью создан и его зависимости внедрены (инициализация). Этот метод вызывается один раз для каждого экземпляра бина.
+
+`Цель`: Выполнение логики, требующей полностью сконфигурированный бин (например, начальная настройка).
+
+### Сколько @PostConstruct можно задекларировать в бине?
+
+Можно задекларировать только один метод с @PostConstruct в одном бине. Если попытаться добавить несколько методов с этой аннотацией, Spring выбросит ошибку.
 
 [К оглавлению](#Spring)
 
 # Dependency management в Spring boot
 
+Dependency Management — это управление зависимостями приложения. В Spring Boot используется механизм Maven или Gradle для автоматического добавления, обновления и совместимости библиотек.
+
+1. Spring Boot Starter Dependencies:
++ Группы зависимостей (например, spring-boot-starter-web), которые включают всё необходимое для работы. 
++ Упрощают настройку: вместо добавления каждой библиотеки вручную, добавляется “стартер”.
+
+````
+<dependency>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+````
+
+2. Spring Boot Dependency Management:
++ Использует BOM (Bill of Materials) для управления версиями зависимостей. 
++ Версии зависимостей определяются в родительском POM (spring-boot-dependencies), что гарантирует их совместимость.
+
+````
+<parent>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-parent</artifactId>
+<version>3.0.0</version>
+</parent>
+````
+
+3. Профили зависимостей: Можно включать зависимости в зависимости от среды выполнения (например, dev, test, prod) с помощью профилей Maven.
+
+4. Эксплицитные зависимости: Spring Boot позволяет переопределить версию зависимости, если требуется особая версия.
+
 [К оглавлению](#Spring)
 
 # Spring Security, как хранить пароль пользователя?
+
+### Правила безопасного хранения паролей:
+
++ Не хранить пароли в виде открытого текста. 
++ Использовать хэширование: Пароль перед сохранением в базе данных должен быть преобразован в хэш (необратимое преобразование).
+
+### Как хранить пароль в Spring Security?
+
++ Хэширование с помощью BCrypt: Spring Security предоставляет поддержку алгоритма BCrypt, который подходит для хэширования паролей.
+
+````
+Пример:
+
+@Bean
+public PasswordEncoder passwordEncoder() {
+return new BCryptPasswordEncoder();
+}
+При сохранении пароля:
+
+@Autowired
+private PasswordEncoder passwordEncoder;
+
+public void saveUser(String rawPassword) {
+String hashedPassword = passwordEncoder.encode(rawPassword);
+// Сохранение hashedPassword в базе данных
+}
+````
+
++ Проверка пароля: При аутентификации введённый пароль сравнивается с хэшированным значением в базе данных:
+
+`boolean matches = passwordEncoder.matches(rawPassword, hashedPassword);`
+
+### Где хранить пароли?
+
++ В базе данных:
+Пароли сохраняются в виде хэшей, используя безопасные алгоритмы (например, BCrypt, PBKDF2, Argon2).
+Используйте столбцы с ограничением по длине, чтобы избежать уязвимости типа переполнения.
+
+````
+Пример схемы таблицы:
+
+CREATE TABLE users (
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+username VARCHAR(50) NOT NULL,
+password VARCHAR(255) NOT NULL,
+role VARCHAR(20) NOT NULL
+);
+````
+
+### Почему BCrypt?
+
++ Солирование: BCrypt автоматически добавляет случайную строку данных (соль) к каждому паролю, чтобы одинаковые пароли имели разные хэши.
++ Замедление: У BCrypt есть возможность настройки сложности (work factor), что увеличивает время вычисления хэша, защищая от атак перебором.
 
 [К оглавлению](#Spring)
 
 # Spring Profiles как с ними работать?
 
+Spring Profiles позволяют загружать разные настройки в зависимости от окружения (разработка, тестирование, прод).
+
+### Как задать профиль?
+
+1. В application.properties/yml
+
+````
+Указываем профиль в application.properties:
+
+spring.profiles.active=dev
+
+
+Или в application.yml:
+
+spring:
+profiles:
+active: dev
+````
+
+2. Через аргументы JVM (-Dspring.profiles.active=prod)
+
+Можно передавать профиль при запуске:
+
+`java -jar myapp.jar --spring.profiles.active=prod`
+
+### Как создать разные настройки для профилей?
+
+Способ 1: Разные файлы application-{profile}.properties
+
++ application-dev.properties (локальная разработка)
++ application-prod.properties (продакшен)
++ application-test.properties (тестирование)
+
+````
+Пример application-dev.properties:
+
+server.port=8080
+spring.datasource.url=jdbc:mysql://localhost:3306/dev_db
+Пример application-prod.properties:
+
+server.port=80
+spring.datasource.url=jdbc:mysql://prod-db:3306/prod_db
+````
+
+Способ 2: Использование @Profile в коде
+
+````
+@Component
+@Profile("dev")
+public class DevDataSource implements DataSourceConfig {
+  @Override
+  public void setup() {
+    System.out.println("DEV database setup");
+  }
+}
+
+@Component
+@Profile("prod")
+public class ProdDataSource implements DataSourceConfig {
+  @Override
+  public void setup() {
+    System.out.println("PROD database setup");
+  }
+}
+
+Если активен профиль dev, то создастся DevDataSource, иначе — ProdDataSource.
+````
+
+Способ 3: Использование @IfProfileValue.
+Этот метод работает только для простых значений (не динамические профили).
+
+````
+@IfProfileValue(name = "spring.profiles.active", notValue = "prod")
+public void runOnlyInDev() {
+  System.out.println("Этот код выполняется НЕ в проде!");
+}
+````
+
 [К оглавлению](#Spring)
 
 # Виды proxy в Spring
 
+Spring использует динамическое проксирование (Proxy) для создания AOP-оберток над бинами.
+
+| Ситуация          | Описание                           | Как создается?         |
+|-------------------|------------------------------------|------------------------|
+| JDK Dynamic Proxy | Использует java.lang.reflect.Proxy | Для интерфейсов        |
+| CGLIB Proxy       | Использует net.sf.cglib.proxy      | Для классов            |
+| AspectJ Proxy     | Используется в Spring AOP          | Нужно доп. подключение |
+
+`JDK Dynamic Proxy (java.lang.reflect.Proxy)`
+
++ Используется только для интерфейсов. 
++ Создает прокси-класс, который реализует интерфейс.
+
+````
+Пример:
+
+public interface Service {
+  void doWork();
+}
+
+public class ServiceImpl implements Service {
+  public void doWork() {
+    System.out.println("Работа выполнена!");
+  }
+}
+
+
+Создание динамического прокси вручную:
+
+Service proxy = (Service) Proxy.newProxyInstance(
+  Service.class.getClassLoader(),
+  new Class[]{Service.class},
+  (proxyObj, method, args) -> {
+    System.out.println("Логирование перед вызовом метода...");
+    return method.invoke(new ServiceImpl(), args);
+  }
+);
+proxy.doWork();
+
+
+Вывод:
+
+Логирование перед вызовом метода...
+Работа выполнена!
+````
+
+`CGLIB Proxy (net.sf.cglib.proxy)`
+
++ Используется для классов (даже если нет интерфейса). 
++ Создает подкласс оригинального класса.
+
+````
+Пример:
+
+public class Service {
+  public void doWork() {
+    System.out.println("Работа выполнена!");
+  }
+}
+
+
+Создание CGLIB-прокси вручную:
+
+Enhancer enhancer = new Enhancer();
+enhancer.setSuperclass(Service.class);
+enhancer.setCallback((MethodInterceptor) (obj, method, args, proxy) -> {
+  System.out.println("Логирование перед вызовом метода...");
+  return proxy.invokeSuper(obj, args);
+});
+Service proxy = (Service) enhancer.create();
+proxy.doWork();
+
+Вывод:
+
+Логирование перед вызовом метода...
+Работа выполнена!
+````
+
+### Spring cglib vs dynamic proxy
+
+| Функция            | JDK Dynamic Proxy                | CGLIB Proxy                 |
+|--------------------|----------------------------------|-----------------------------|
+| Где работает?      | Только с интерфейсами            | Работает с классами         |
+| Как создается?     | java.lang.reflect.Proxy          | net.sf.cglib.proxy.Enhancer |
+| Наследование       | Нельзя наследовать логику класса | Создает подкласс            |
+| Производительность | Чуть быстрее                     | Немного медленнее           |
+
+### Какое proxy по-умолчанию в Spring?
+
+Spring использует JDK Dynamic Proxy по умолчанию.
+
+### Когда используется CGLIB?
+
++ Если класс не реализует интерфейс. 
++ Если явно указать: @EnableAspectJAutoProxy(proxyTargetClass = true)
+
+### Как проверить, какой Proxy используется?
+
+````
+ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+Object proxy = context.getBean(MyService.class);
+System.out.println(proxy.getClass());
+
+Выведет com.sun.proxy.$Proxy... для JDK Dynamic Proxy 
+или MyService$$EnhancerByCGLIB$$... для CGLIB.
+````
+
 [К оглавлению](#Spring)
 
 # @Lookup
+
+@Lookup — это аннотация в Spring, позволяющая в singleton-бине (одиночке) получать новый экземпляр prototype-бина при каждом вызове метода. Без @Lookup при внедрении prototype-бина в singleton он создаётся только один раз.
+
+### Как это работает
+
++ Ты помечаешь метод в singleton-классе аннотацией @Lookup. 
++ Spring динамически переопределяет этот метод (через CGLIB). 
++ При каждом вызове метода Spring запрашивает новый prototype-бин из контекста.
+
+```java
+@Component
+@Scope("prototype")
+public class PrototypeBean {
+    public void doSomething() {
+        System.out.println("PrototypeBean: " + this);
+    }
+}
+@Component
+public abstract class SingletonBean {
+
+    public void process() {
+        // Каждый раз получаем новый экземпляр PrototypeBean
+        PrototypeBean prototypeBean = getPrototypeBean();
+        prototypeBean.doSomething();
+    }
+
+    @Lookup
+    protected abstract PrototypeBean getPrototypeBean();
+}
+```
+
+### Что здесь происходит?
+
++ SingletonBean — бин с scope = singleton (по умолчанию). 
++ PrototypeBean — бин с scope = prototype. 
++ Метод getPrototypeBean() аннотирован @Lookup, и Spring подменяет его реализацию: при вызове getPrototypeBean() возвращается новый PrototypeBean.
+
+### Зачем нужно
+
++ Когда в singleton-бине надо часто создавать prototype-объекты. 
++ Чтобы не использовать вручную ApplicationContext.getBean(). 
++ Для избежания утечек памяти (прототипы не живут вечно внутри синглтона).
 
 [К оглавлению](#Spring)

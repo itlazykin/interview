@@ -1,9 +1,10 @@
 ## Ответы на вопросы для интервью 
 
 + [Java Core](src/main/java/ru/job4j/JavaCore.md#JavaCore)
-+ [OOP](src/main/java/ru/job4j/OOP.md#OOP)
-+ [FunctionalInterface](src/main/java/ru/job4j/FunctionalInteface.md#FunctionalInterface)
++ [ООП](src/main/java/ru/job4j/OOP.md#OOP)
++ [Функциональные интерфейсы](src/main/java/ru/job4j/FunctionalInteface.md#FunctionalInterface)
 + [Структуры данных и алгоритмы](src/main/java/ru/job4j/DataStructuresAndAlgorithms.md#DataStructuresAndAlgorithms)
++ [Исключения](src/main/java/ru/job4j/Exceptions.md#Exceptions)
 + [SOLID](src/main/java/ru/job4j/SOLID.md#SOLID)
 + [Дженерики](src/main/java/ru/job4j/Generics.md#Generics)
 + [Git](src/main/java/ru/job4j/Git.md#git)

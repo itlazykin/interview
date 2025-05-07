@@ -20,7 +20,7 @@
 
 [Кэширование](#кэширование)
 
-[HQL и JPQL](#hql-и-jpql)
+[HQL и JPQL и native SQL](#hql-и-jpql-и-native-sql)
 
 [EntityManager + EntityManagerFactory / SessionFactory + session](#entitymanager--entitymanagerfactory--sessionfactory--session)
 
@@ -50,9 +50,11 @@
 
 [Как JPA делает запросы?](#как-jpa-делает-запросы)
 
+[Что дает CrudRepository, JpaRepository](#что-дает-crudrepository-jparepository)
+
 # Что такое Hibernate, JPA, JDBC, ORM?
 
-+ Hibernate - это ORM Framework (один из самых распространённых JPA реализаций)
++ Hibernate - это ORM Framework (один из самых распространённых JPA реализаций). Предоставляет инструменты для работы с бд, позволяя взаимодействовать с данными в объектно - ориентированном стиле, не вдаваясь в детали работы с SQL.
 + JPA - это спецификация Java, которая предоставляет набор интерфейсов/аннотаций
 + ORM - процесс преобразования объектно-ориентированной модели в реляционную и наоборот
 + JDBC - низкоуровневый API для взаимодействия с базами данных.
@@ -360,11 +362,11 @@ session.delete();
 
 [К оглавлению](#ORM)
 
-# HQL и JPQL
+# HQL и JPQL и native SQL
 
 Являются объектно-ориентированными языками запросов, схожими по природе с SQL
 
-+ HQL полностью объектно-ориентирован и расширяет JPQL
++ HQL полностью объектно-ориентирован и расширяет JPQL, работает с объектами сущностей. HQL позволяет выполнять запросы, которые оперируют объектами и их свойствами, а не непосредственно таблицами базы данных.
 
 + JPQL - это стандарт JPA, который поддерживается всеми реализациями JPA, а HQL - реализация Hibernate
 
@@ -926,5 +928,13 @@ User user = session.get(User.class, 1L);
 
 SELECT * FROM users WHERE id = 1;
 ```
+
+[К оглавлению](#ORM)
+
+# Что дает CrudRepository, JpaRepository
+
+CrudRepository даёт базовые CRUD-методы, а JpaRepository добавляет JPA-специфичные функции: пагинацию, сортировку,
+пакетные операции и работу с EntityManager. Если нужна только вставка/обновление/удаление — хватит CrudRepository, но
+для сложных JPA-проектов лучше JpaRepository.
 
 [К оглавлению](#ORM)

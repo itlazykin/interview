@@ -80,6 +80,8 @@
 
 [@Lookup](#lookup)
 
+[application.properties, @PropertySource в spring boot](#applicationproperties-propertysource-в-spring-boot)
+
 # Зачем мы используем Spring? Почему его так любят?
 
 Spring — это один из самых популярных фреймворков для разработки приложений на Java. Его используют благодаря широкому
@@ -155,7 +157,7 @@ Dependency Injection (внедрение зависимостей) — это с
 
 [К оглавлению](#Spring)
 
-# Что такое Bean? 
+# Что такое Bean?
 
 Bean в Spring — это объект, управляемый контейнером Spring IoC. Это основной строительный блок приложения, который
 регистрируется и конфигурируется контейнером.
@@ -2222,5 +2224,19 @@ public abstract class SingletonBean {
 + Когда в singleton-бине надо часто создавать prototype-объекты. 
 + Чтобы не использовать вручную ApplicationContext.getBean(). 
 + Для избежания утечек памяти (прототипы не живут вечно внутри синглтона).
+
+[К оглавлению](#Spring)
+
+# application.properties, @PropertySource в spring boot
+
+В Spring Boot application.properties — это основной файл конфигурации, который загружается автоматически. Если нужно подключить дополнительные свойства, используется @PropertySource.
+
+[К оглавлению](#Spring)
+
+# Этапы поднятия context
+
+![ontext.png](../../../resources/ontext.png)
+
+![context.png](../../../resources/context.png)
 
 [К оглавлению](#Spring)

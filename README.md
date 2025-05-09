@@ -9,14 +9,16 @@
 + [Многопоточка](src/main/java/ru/job4j/Multithreading.md#Multithreading)
 + [Git](src/main/java/ru/job4j/Git.md#git)
 + [Структуры данных и алгоритмы](src/main/java/ru/job4j/DataStructuresAndAlgorithms.md#DataStructuresAndAlgorithms)
++ [Test](src/main/java/ru/job4j/Test.md#Test)
 + [DB](src/main/java/ru/job4j/DB.md#DB)
 + [SQL](src/main/java/ru/job4j/SQL.md#SQL)
 + [NoSql](src/main/java/ru/job4j/NoSql.md#NoSql)
 + [ORM](src/main/java/ru/job4j/ORM.md#ORM)
-+ [Test](src/main/java/ru/job4j/Test.md#Test)
++ [Liquibase](src/main/java/ru/job4j/Liquidbase.md#Liquidbase)
 + [SOLID](src/main/java/ru/job4j/SOLID.md#SOLID)
 + [Spring](src/main/java/ru/job4j/Spring.md#Spring)
-+ [Spring](src/main/java/ru/job4j/Microservices.md#Microservices)
++ [Microservices](src/main/java/ru/job4j/Microservices.md#Microservices)
+
 
 
 

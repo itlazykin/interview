@@ -5,6 +5,7 @@
 + [Функциональные интерфейсы](src/main/java/ru/job4j/FunctionalInteface.md#FunctionalInterface)
 + [Исключения](src/main/java/ru/job4j/Exceptions.md#Exceptions)
 + [Дженерики](src/main/java/ru/job4j/Generics.md#Generics)
++ [Stream Api](src/main/java/ru/job4j/StreamAPI.md#StreamAPI)
 + [Многопоточка](src/main/java/ru/job4j/Multithreading.md#Multithreading)
 + [Git](src/main/java/ru/job4j/Git.md#git)
 + [Структуры данных и алгоритмы](src/main/java/ru/job4j/DataStructuresAndAlgorithms.md#DataStructuresAndAlgorithms)

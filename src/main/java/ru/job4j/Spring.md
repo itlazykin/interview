@@ -82,6 +82,8 @@
 
 [application.properties, @PropertySource в spring boot](#applicationproperties-propertysource-в-spring-boot)
 
+[Этапы поднятия context](#этапы-поднятия-context)
+
 # Зачем мы используем Spring? Почему его так любят?
 
 Spring — это один из самых популярных фреймворков для разработки приложений на Java. Его используют благодаря широкому

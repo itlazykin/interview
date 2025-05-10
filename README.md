@@ -20,6 +20,7 @@
 + [Microservices](src/main/java/ru/job4j/Microservices.md#Microservices)
 + [CI CD](src/main/java/ru/job4j/CICD.md#CICD)
 + [Паттерны проектирования GOF](src/main/java/ru/job4j/GOF.md#GOF)
++ [Брокеры сообщений](src/main/java/ru/job4j/MessageBrokers.md#MessageBrokers)
 
 
 

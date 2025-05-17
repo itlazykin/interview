@@ -218,7 +218,7 @@ CROSS JOIN departments;
 ```
 SELECT e1.name AS employee1, e2.name AS manager
 FROM employees e1
-INNER JOIN employees e2 ON e1.manager_id = e2.id;
+SELF JOIN employees e2 ON e1.manager_id = e2.id;
 Результат: Список сотрудников и их менеджеров.
 ```
 

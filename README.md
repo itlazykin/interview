@@ -22,6 +22,7 @@
 + [Microservices](src/main/java/ru/job4j/Microservices.md#Microservices)
 + [CI CD](src/main/java/ru/job4j/CICD.md#CICD)
 + [Брокеры сообщений](src/main/java/ru/job4j/MessageBrokers.md#MessageBrokers)
++ [ImmutableClass](src/main/java/ru/job4j/Immutable.md#ImmutableClass)
 
 
 

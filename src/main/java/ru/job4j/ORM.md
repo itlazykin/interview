@@ -388,76 +388,60 @@ Session - основной интерфейс для взаимодействи�
 
 # Проблема N + 1. Способы решения проблемы
 
-Проблема N+1 возникает, когда для выборки коллекции сущностей выполняется один запрос, а для каждой сущности — ещё один дополнительный запрос к связанным данным. В итоге получаем огромное количество SQL-запросов
+Проблема N+1 возникает, когда для выборки коллекции сущностей выполняется один запрос, а для каждой сущности — ещё один
+дополнительный запрос к связанным данным. В итоге получаем огромное количество SQL-запросов
 
 ### Как возникает проблема N+1?
 
-+ Основной запрос (1 запрос) — Hibernate загружает коллекцию сущностей (например, List<User>).
-+ Дополнительные запросы (N запросов) — При обращении к связанным сущностям (например, user.getOrders()) для каждой записи выполняется отдельный SQL-запрос.
+Представь, у тебя есть список пользователей (User), и у каждого пользователя есть список заказов (Order).
+
+ORM делает 1 запрос: `SELECT * FROM users;` → Получили список из N пользователей.
+
+Потом для каждого пользователя делает ещё N запросов на заказы:
 
 ```java
-Пример
-
-Допустим, у нас есть две сущности:
-
-@Entity
-public class User {
-  @Id
-  private Long id;
-  private String name;
-
-  @OneToMany(mappedBy = "user")
-  private List<Order> orders;
-}
-
-@Entity
-public class Order {
-  @Id
-  private Long id;
-  private String product;
-
-  @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
-}
-
-Если мы выполним запрос:
-
-List<User> users = session.createQuery("FROM User", User.class).getResultList();
-for (User user : users) {
-    System.out.println(user.getName() + " has orders: " + user.getOrders().size());
-}
-
-Hibernate сначала выполнит 1 запрос для получения всех пользователей:
-
-SELECT * FROM User;
-
-А затем для каждого пользователя — отдельный запрос для загрузки его заказов:
-
-SELECT * FROM Order WHERE user_id = ?; 
--- выполняется N раз (по количеству пользователей)
-
-Итого: 1 (основной запрос) + N (дополнительных запросов) → проблема N+1.
+SELECT * FROM orders WHERE user_id = 1;
+SELECT * FROM orders WHERE user_id = 2;
+...
+SELECT * FROM orders WHERE user_id = N;
 ```
+
+В итоге имеем 1 + N запросов вместо одного нормального — отсюда название N + 1 проблема.
+Это сильно замедляет работу приложения.
 
 ### Как решить проблему N+1?
 
 + `Использование JOIN FETCH (Eager Loading)`. Можно сразу загрузить связанные сущности в одном запросе: 
 
 ```java
-List<User> users = session.createQuery(
-        "SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.orders", User.class
-).getResultList();
+@Query("SELECT u FROM User u JOIN FETCH u.orders")
+List<User> findAllWithOrders();
 
-
-Теперь Hibernate выполнит один запрос с JOIN:
-
-SELECT DISTINCT u.*, o.* FROM User u LEFT JOIN Order o ON u.id = o.user_id;
+Получаем один SQL-запрос с JOIN вместо 1+N.
 ```
 
-+ `Использование @BatchSize (Ленивая загрузка с батчингом)`. Если оставить ленивую загрузку (FetchType.LAZY), но добавить @BatchSize, Hibernate загрузит связанные сущности партиями. Полезен, если связанные сущности не всегда нужны.
-+ `Использование @NamedEntityGraph`. Позволяет гибко настраивать загрузку связанных сущностей
++ `Использование @BatchSize (Ленивая загрузка с батчингом)`. Настроить ORM, чтобы он не делал по одному запросу на каждый объект, а загружал связи пачками. `hibernate.default_batch_fetch_size=16`
++ `Использование Entity Graph`. Позволяет гибко настраивать загрузку связанных сущностей
+
+```java
+Указать, какие связи нужно подтянуть
+        
+@EntityGraph(attributePaths = "orders")
+@Query("SELECT u FROM User u")
+List<User> findAllWithOrders();
+
+ORM сам подстроит запрос и сделает join
+```
+
 + `Использование DTO или Projections`. Вместо загрузки полных сущностей можно сразу выбрать нужные данные
+
+```java
+@Query("SELECT new com.example.UserOrderDTO(u.name, o.id, o.amount) 
+        FROM User u JOIN u.orders o")
+List<UserOrderDTO> findUserOrders();
+
+Быстро и оптимально, но меньше гибкости ORM
+```
 
 [К оглавлению](#ORM)
 
@@ -704,8 +688,36 @@ SELECT * FROM users WHERE username = 'user' OR '1'='1' AND password = 'password'
   + Возможность изменить данные в БД 
   + Доступ к конфиденциальной информации
 + Как избежать:
-  + Использовать PreparedStatement 
-  + Использовать Hibernate
+  + Использовать PreparedStatement, который позволяет безопасно передавать параметры без конкатенации строк
+  + Использовать Hibernate, которые автоматически параметризуют запросы, валидировать ввод пользователя и ограничивать права доступа в базе.
+
+```java
+String sql = "SELECT * FROM employees WHERE id = ?";
+PreparedStatement ps = connection.prepareStatement(sql);
+ps.setInt(1, employeeId);
+ResultSet rs = ps.executeQuery();
+```
+
+#### Инструменты и утилиты для обнаружения SQL-инъекций
+
+- Static Application Security Testing — статический анализ кода. Анализируют код без запуска, находят места, где SQL запрос формируется конкатенацией строк
+  - SonarQube (с плагинами SonarJava, FindSecBugs)
+  - Checkmarx 
+  - Fortify Static Code Analyzer 
+  - Semgrep
+
+- Dynamic Application Security Testing — динамическое тестирование. Запускают приложение и эмулируют атаки (вводят payload-ы в параметры, проверяют реакцию).
+  Если запрос не экранирован — находят уязвимость.
+  - OWASP ZAP (Zed Attack Proxy)
+  - Burp Suite 
+  - Nikto
+
+- Инструменты для пентестинга и проверки БД. Можно «пробить» приложение, подставляя вредоносные SQL и смотреть на ответы
+  - SQLMap — автоматизированная утилита для нахождения и эксплуатации SQL-инъекций. 
+
+- IDE и плагины
+  - FindBugs / SpotBugs + FindSecBugs plugin — подсвечивает потенциальные SQL-инъекции в Java-коде. 
+  - IntelliJ IDEA Security Audit plugins — помогают отлавливать опасные места.
 
 [К оглавлению](#ORM)
 
@@ -970,6 +982,13 @@ CrudRepository даёт базовые CRUD-методы, а JpaRepository до�
 
 # Embeddable класс
 
-Embeddable — это механизм JPA, который позволяет вынести набор логически связанных полей в отдельный класс без создания отдельной таблицы. Это обычный POJO, помеченный аннотацией @Embeddable. Он встраивается в сущность через @Embedded, и его поля становятся колонками в таблице этой сущности. Это удобно для повторного использования, структурирования кода и избавления от дублирования. В отличие от @Entity, у такого класса нет собственного id и таблицы
+Это специальный класс в JPA, который не является самостоятельной сущностью (у него нет своей таблицы),
+а встраивается в другую сущность.
+То есть это кусочек данных, который можно «вложить» внутрь другой сущности. 
+
+В отличие от @Entity, у такого класса нет собственного id и таблицы
+
+@Embeddable — это способ группировать поля в отдельный класс и встраивать его в сущность без отдельной таблицы. Удобно
+для повторного использования и логического разделения данных.
 
 [К оглавлению](#ORM)

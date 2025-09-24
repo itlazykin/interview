@@ -64,10 +64,16 @@
 
 [DELETE vs TRUNCATE](#delete-vs-truncate)
 
-# DDL и DML
+# DDL DML DCL DQL TCL
 
-+ DDL (Data Definition Language) - Создание, изменение и удаление структуры БД (CREATE, ALTER, DROP, TRUNCATE, RENAME)
++ DDL (Data Definition Language) - Создание, изменение и удаление структуры БД (CREATE, ALTER, DROP, TRUNCATE(удаляет все строки из таблицы, но сохраняет саму структуру таблицы), RENAME)
 + DML (Data Manipulation Language) - Работа с данными внутри таблиц(SELECT, INSERT, UPDATE, DELETE)
++ DCL (Data Control Language) - для управления правами доступа и разрешениями пользователей к базе данных и её объектам(REVOKE(Отзывает ранее предоставленные привилегии у пользователя или роли), GRANT(Предоставляет пользователю или роли определённые привилегии (права) на объекты базы данных))
++ DQL (Data Query Language) - для извлечения (запроса) данных из базы данных (SELECT)
++ TCL (Transaction Control Language) - управление транзакциями (COMMIT(Фиксирует
+все изменения, сделанные в текущей транзакции), ROLLBACK(Отменяет
+все изменения, сделанные в текущей транзакции, возвращая базу к состоянию до начала транзакции), SAVEPOINT(Создаёт
+промежуточную точку внутри транзакции, к которой можно откатиться))
 
 [К оглавлению](#SQL)
 
